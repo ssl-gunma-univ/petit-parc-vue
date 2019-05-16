@@ -1,0 +1,30 @@
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: "Hiragino Kaku Gothic ProN", "メイリオ", sans-serif;
+}
+
+main {
+    padding-top: 5rem;
+}
+
+img {
+    width: 100%;
+}
+
+.back {
+    padding: 1rem;
+    background-color: #87CEFA;
+}
+
+.turn {
+    padding: 1rem;
+    background-color: #993333;
+}
+
+.mback {
+    padding: 1rem;
+    background-color: rgb(90, 101, 114);
+}
