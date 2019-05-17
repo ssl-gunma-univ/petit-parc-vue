@@ -1,13 +1,13 @@
 export default {
-  roomJoined (state, createdRoom) {
-    state.room = createdRoom
-  },
+    roomJoined(state, createdRoom){
+        state.room = createdRoom
+    },
 
-  userLogedIn (state, user) {
-    state.me = user
-  },
+    userLogedIn(state, user){
+        state.me = user
+    },
 
-  setAllRooms (state, rooms) {
-    state.rooms = rooms
-  }
+	setAllRooms(state, rooms){
+		state.rooms = rooms
+	}
 }
