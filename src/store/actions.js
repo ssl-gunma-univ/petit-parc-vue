@@ -46,7 +46,12 @@ export default {
 
  addUserToRoom({ commit, state, dispatch }, payload){
      db.collection("rooms").doc(payload.roomId).update({
-         users: firebase.firestore.FieldValue.arrayUnion(payload.user)
+         // see firestore doc for details
+         users: firebase.firestore.FieldValue.arrayUnion(payload.user),
+         events: firebase.firestore.FieldValue.arrayUnion({
+             action: 'user_joined',
+             author: payload.user.username
+         })
      })
      commit('userLogedIn', payload.user)
  },

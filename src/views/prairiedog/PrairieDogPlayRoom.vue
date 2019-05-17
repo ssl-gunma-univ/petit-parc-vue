@@ -84,9 +84,9 @@
                 <div v-if="me.role == 'host'"
                     class="col-lg-4 mb-3 text-center mback rounded shadow">
                     <h3 class="text-white">GAME MENU</h3>
-                    <button id="start" type="button" class="btn btn-primary mb-2 w-50" disabled>GAME START</button><br>
-                    <button id="next" type="button" class="btn btn-success mb-2 w-50" disabled>NEXT GAME</button><br>
-                    <button id="remove" type="button" class="btn btn-danger w-50">部屋解散</button>
+                    <button @click="gameStart" :disabled="nplayers < 4" id="start" type="button" class="btn btn-primary mb-2 w-50">GAME START</button><br>
+                    <button @click="nextGame"  :disabled="! gameOver" id="next" type="button" class="btn btn-success mb-2 w-50" >NEXT GAME</button><br>
+                    <button @click="destroyRoom" id="remove" type="button" class="btn btn-danger w-50">部屋解散</button>
                 </div>
             </div>
         </main>
@@ -98,7 +98,8 @@ import { mapState, mapGetters } from 'vuex'
 export default {
   data () {
     return {
-      attempt: ''
+      attempt: '',
+      gameOver: false
     }
   },
   computed: {
@@ -109,7 +110,8 @@ export default {
     ...mapGetters([
       'userleft',
       'usertop',
-      'userright'
+      'userright',
+      'nplayers'
     ])
   },
   methods: {
@@ -118,6 +120,15 @@ export default {
     },
     coyote () {
       console.log('coyote')
+    },
+    gameStart() {
+        console.log('gameStart')
+    },
+    destroyRoom() {
+        console.log('destroyRoom')
+    },
+    nextGame() {
+        console.log('nextGame')
     }
   },
   created () {
