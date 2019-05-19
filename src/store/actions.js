@@ -58,11 +58,25 @@ export default {
 
  watchRoom({ commit, state }, roomId){
 	//TODO: maybe better to have events stored in subcollection
+    // that could be watched seperately
 	db.collection("rooms").doc(roomId)
     .onSnapshot(doc => {
         let room = doc.data()
         room.id = roomId
         commit('roomJoined', room);
     });
+ },
+
+ resetCards({ commit, state }, cards){
+     db.collection("rooms").doc(state.room.id).update(
+         {
+             cards: cards,
+             events: firebase.firestore.FieldValue.arrayUnion({
+                 action: 'new_game',
+             })
+          }
+     )
+       .then( () => console.log('cards successfuly reset') )
+       .catch( (err) => console.error(err) )
  }
 }

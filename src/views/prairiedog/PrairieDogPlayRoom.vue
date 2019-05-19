@@ -76,7 +76,7 @@
                     <p id="myCard"></p>
                     <input v-model="attempt" type="number" id="textBox">
                     <input type="button" id="callButton" value="数字宣言" @click="call"><br>
-                    <button id="prairie" type="button" class="btn btn-warning mt-3" @click="coyote">プレーリードッグ！</button>
+                    <button id="prairie" type="button" class="btn btn-warning mt-3" @click="callPrairieDog">プレーリードッグ！</button>
                     <div id="damage_p0" class="mt-3">
                         {{ me.score }}
                     </div>
@@ -99,36 +99,59 @@ export default {
   data () {
     return {
       attempt: '',
-      gameOver: false
+      gameOver: false,
+      initialCardNumbers : [1, 2, 4, 4, 4, 4, 4, 4, 3, 2, 1, 1, 1, 1],
+      cardsType : ['-10', '-5', '0', '1', '2', '3', '4', '5', '10', '15', '20', '×2', 'MAX → 0', '?']
     }
   },
   computed: {
     ...mapState([
       'me',
-      'room'
+      'room',
     ]),
     ...mapGetters([
       'userleft',
       'usertop',
       'userright',
-      'nplayers'
-    ])
+      'nplayers',
+      'cardsLeft'
+    ]),
   },
   methods: {
     call () {
       console.log('called')
     },
-    coyote () {
+
+    callPrairieDog () {
       console.log('coyote')
     },
+
     gameStart() {
         console.log('gameStart')
+        this.resetCards()
     },
+
     destroyRoom() {
         console.log('destroyRoom')
     },
+
     nextGame() {
         console.log('nextGame')
+    },
+
+    resetCards(){
+        /* method called only by user with role `host` */
+
+        /* card objects have type and cardsLeft properties */
+
+        // make list of card objects
+        const cards = this.cardsType.map( (type, typeIdx) => {
+            return { 
+                type: type,
+                cardsLeft: this.initialCardNumbers[typeIdx]
+            }
+        })
+        this.$store.dispatch('resetCards', cards)
     }
   },
   created () {
