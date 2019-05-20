@@ -2,23 +2,33 @@ import { db } from '@/main'
 import firebase from 'firebase'
 
 export default {
- createRoom({commit, dispatch}, room){
+ createRoom({commit, dispatch, state}, room){
       // writing room information to db
-      db.collection("rooms").add(room)
-          .then(docRef => {
-              /* saving the id of the room on firestore */
-              room.id = docRef.id
+        /* card objects have type and cardsLeft properties */
 
-              // commit room to state
-              //commit('roomJoined', room)
-              console.log('createRoom: roomID', room.id)
-              dispatch('watchRoom', room.id)
+        // make list of card objects
+        const cards = state.cardsType.map( (type, typeIdx) => {
+            return {
+                type: type,
+                cardsLeft: state.initialCardNumbers[typeIdx]
+            }
+        })
+     room.cards = cards
+     db.collection("rooms").add(room)
+         .then(docRef => {
+             /* saving the id of the room on firestore */
+             room.id = docRef.id
 
-              // also commit player on this client who is also the host
-              // that is why he is indexed by 0
-              commit('userLogedIn', room.users[0])
-          })
-         .catch( (err) => { console.error(err) } )
+             // commit room to state
+             //commit('roomJoined', room)
+             console.log('createRoom: roomID', room.id)
+             dispatch('watchRoom', room.id)
+
+             // also commit player on this client who is also the host
+             // that is why he is indexed by 0
+             commit('userLogedIn', room.users[0])
+         })
+        .catch( (err) => { console.error(err) } )
  },
 
  fetchRooms({commit}){
@@ -67,7 +77,15 @@ export default {
     });
  },
 
- resetCards({ commit, state }, cards){
+ resetCards({ commit, state }){
+     /* Set the cards to their initial state in db */
+     const cards = state.cardsType.map( (type, typeIdx) => {
+            return {
+                type: type,
+                cardsLeft: state.initialCardNumbers[typeIdx]
+            }
+     })
+
      db.collection("rooms").doc(state.room.id).update(
          {
              cards: cards,
@@ -78,5 +96,47 @@ export default {
      )
        .then( () => console.log('cards successfuly reset') )
        .catch( (err) => console.error(err) )
+ },
+
+ drawCards({ commit, state }, cards){
+     /* Only called from `host`.
+      *
+      * Assign a currentCard property to each user.
+      * Also update the remaining cards.
+      * */
+
+    let users = state.room.users.slice()
+                // make copy to avoid accidentaly updating views
+    console.log('cards to draw from', cards)
+
+    var randomDraw = () => {
+        let cardDrawn = false
+        while ( ! cardDrawn ){
+            const cardTypeIdx = Math.floor(Math.random() * cards.length)
+            if ( cards[cardTypeIdx].cardsLeft ){
+                cardDrawn = cards[cardTypeIdx].type
+                cards[cardTypeIdx].cardsLeft -= 1
+            }
+            else
+                // no cards of this type, remove from consideration
+                cards.splice(cardTypeIdx, 1)
+        }
+        return cardDrawn
+    }
+
+    for (let user of users){
+        // assign each user a card
+        user.currentCard = randomDraw()
+    }
+        //update db
+        db.collection("rooms").doc(state.room.id).update({
+                users: users,
+                cards: cards,
+                events: firebase.firestore.FieldValue.arrayUnion({
+                     action: 'new_round',
+                 })
+            })
+        //NOTE: state is updated when db is updated
+        .then(() => console.log('users have drawn cards'))
  }
 }

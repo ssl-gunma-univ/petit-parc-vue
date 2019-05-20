@@ -84,7 +84,7 @@
                 <div v-if="me.role == 'host'"
                     class="col-lg-4 mb-3 text-center mback rounded shadow">
                     <h3 class="text-white">GAME MENU</h3>
-                    <button @click="gameStart" :disabled="nplayers < 4" id="start" type="button" class="btn btn-primary mb-2 w-50">GAME START</button><br>
+                    <button @click="gameStart" :disabled="nplayers < 4 || playing" id="start" type="button" class="btn btn-primary mb-2 w-50">GAME START</button><br>
                     <button @click="nextGame"  :disabled="! gameOver" id="next" type="button" class="btn btn-success mb-2 w-50" >NEXT GAME</button><br>
                     <button @click="destroyRoom" id="remove" type="button" class="btn btn-danger w-50">部屋解散</button>
                 </div>
@@ -100,8 +100,7 @@ export default {
     return {
       attempt: '',
       gameOver: false,
-      initialCardNumbers : [1, 2, 4, 4, 4, 4, 4, 4, 3, 2, 1, 1, 1, 1],
-      cardsType : ['-10', '-5', '0', '1', '2', '3', '4', '5', '10', '15', '20', '×2', 'MAX → 0', '?']
+      playing: false,
     }
   },
   computed: {
@@ -128,7 +127,14 @@ export default {
 
     gameStart() {
         console.log('gameStart')
-        this.resetCards()
+
+        this.playing = true
+
+        //initial distribution of cards to users
+        this.$store.dispatch('drawCards', this.cardsLeft)
+
+        //It is the `host` turn to play
+        // this.$store.dispatch('nextUserPlay')
     },
 
     destroyRoom() {
@@ -141,19 +147,10 @@ export default {
 
     resetCards(){
         /* method called only by user with role `host` */
-
-        /* card objects have type and cardsLeft properties */
-
-        // make list of card objects
-        const cards = this.cardsType.map( (type, typeIdx) => {
-            return { 
-                type: type,
-                cardsLeft: this.initialCardNumbers[typeIdx]
-            }
-        })
-        this.$store.dispatch('resetCards', cards)
+        this.$store.dispatch('resetCards')
     }
   },
+
   created () {
     this.$store.dispatch('watchRoom', this.$route.params.roomId)
   }

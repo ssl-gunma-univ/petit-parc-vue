@@ -36,5 +36,9 @@ export default {
     } else {
         return false
     }
+  },
+
+  cardsLeft(state){
+      return state.room.cards
   }
 }
