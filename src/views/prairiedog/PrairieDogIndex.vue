@@ -72,28 +72,28 @@ export default {
   computed: {
     ...mapState([
       'rooms',
-      'room' // always update when state changes
+      'room' /* always update for any changes detected on firestore */
     ])
   },
   watch: {
     room: function (oldRoom, newRoom) {
       if (this.room.id) {
-        console.log('room.id', this.room.id)
         this.joinRoom()
       }
     }
   },
   methods: {
     createRoom: function () {
-      /** Create room in firestore, register the host's name
-            * and navigate to the waiting room */
+      /** Initialize the room created by this user.
+        * and navigate to the `waiting` room */
 
       // initializing room
       const room = {
         users: [ { username: this.username, role: 'host', damage: 0 } ],
         events: [
           // events have action and author properties
-          // action can be an object
+          // action may be an object
+          // Are both fields always necessary ?
           {
             action: 'room_created',
             author: this.username
@@ -133,8 +133,8 @@ export default {
 
   },
   created () {
-    // TODO: fetch first room from db and
-    //      initialize interface accordingly
+    // TODO: attach listenner only when navigating to this page
+    //       and detach it when navigating.
     this.$store.dispatch('fetchRooms')
   }
 }

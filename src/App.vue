@@ -22,7 +22,9 @@
                 </div>
         </nav>
 
+        <!-- Navigated to components will be displayed here -->
         <router-view/>
+
     </div>
 </template>
 
