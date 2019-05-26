@@ -21,7 +21,6 @@ export default {
 
              // commit room to state
              //commit('roomJoined', room)
-             console.log('createRoom: roomID', room.id)
              dispatch('watchRoom', room.id)
 
              // also commit player on this client who is also the host
@@ -69,11 +68,14 @@ export default {
  watchRoom({ commit, state }, roomId){
 	//TODO: maybe better to have events stored in subcollection
     // that could be watched seperately
+    // or simply keep the lastest event in firestore.
 	db.collection("rooms").doc(roomId)
     .onSnapshot(doc => {
         let room = doc.data()
         room.id = roomId
         commit('roomJoined', room);
+        //NOTE: Many properties used in the view may be computed
+        //at each update
     });
  },
 
@@ -94,8 +96,6 @@ export default {
              })
           }
      )
-       .then( () => console.log('cards successfuly reset') )
-       .catch( (err) => console.error(err) )
  },
 
  drawCards({ commit, state }, cards){
